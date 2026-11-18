@@ -35,7 +35,7 @@ return {
     "neovim/nvim-lspconfig",
     dependencies = { "williamboman/mason-lspconfig.nvim" },
     config = function()
-      
+
       -- [可选] 如果你需要对某个 LSP 进行特殊定制，使用 vim.lsp.config
       -- 例如：为 lua_ls 消除 "Undefined global 'vim'" 的警告
       vim.lsp.config('lua_ls', {
@@ -58,18 +58,18 @@ return {
         group = vim.api.nvim_create_augroup('UserLspConfig', {}),
         callback = function(ev)
           local opts = { buffer = ev.buf, silent = true }
-          
+
           -- 基础跳转
           vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)       -- 跳转到定义
           vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)       -- 查找引用
           vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)             -- 悬浮文档提示
-          
+
           -- 重命名与代码重构
           vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)   -- 变量重命名
           vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts) -- 代码动作
-          
+
           -- 格式化
-          vim.keymap.set('n', '<leader>f', function()
+          vim.keymap.set('n', '<leader>lf', function()
             vim.lsp.buf.format { async = true }
           end, opts)
         end,
