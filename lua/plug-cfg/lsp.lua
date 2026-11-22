@@ -22,6 +22,9 @@ return {
           "lua_ls",     -- Lua
           "pyright",    -- Python
           "ts_ls",      -- TypeScript/JS
+          "vue_ls",      -- TypeScript/JS
+          "yamlls",
+          "html",
           -- "gopls",      -- Go
           "jsonls",     -- JSON
         },
@@ -48,7 +51,7 @@ return {
 
       -- 🔥 核心：使用 vim.lsp.enable() 启动你的语言服务器
       -- 这取代了以前复杂的 setup 和 setup_handlers
-      local servers = { "lua_ls", "pyright", "ts_ls", "gopls", "jsonls" }
+      local servers = { "lua_ls", "pyright", "ts_ls", "vue_ls", "yamlls", "html","gopls", "jsonls" }
       for _, server in ipairs(servers) do
         vim.lsp.enable(server)
       end
