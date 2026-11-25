@@ -23,5 +23,6 @@ require("lazy").setup({
     require("plug-cfg.render-markdown"),   -- markdown预览插件(实时预览)
     require("plug-cfg.flash_nvim"),   -- 
     require("plug-cfg.lsp"),   -- mason等相关语言服务器配置
+    require("plug-cfg.imselect"),   -- 自动切换输入法
 })
 
