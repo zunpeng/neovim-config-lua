@@ -63,6 +63,7 @@ local mappings = {
     -- ========== 新增：bufferline 标签页操作 ==========
     { from = '<Leader>th', to = '<cmd>BufferLineCyclePrev<CR>', silent = true, desc = '切换到左侧标签页' },
     { from = '<Leader>tl', to = '<cmd>BufferLineCycleNext<CR>', silent = true, desc = '切换到右侧标签页' },
+    { from = '<Leader>tn', to = '<cmd>enew<CR>', silent = true, desc = '新建空白标签页' },
     {
         from = '<Leader>tq',
         to = function()
@@ -79,10 +80,10 @@ local mappings = {
     },
     -- telescope 标签列表操作
     {
-    from = '<Leader>tm',
-    to = '<cmd>Telescope buffers sort_mru=true select_current=true<CR>', 
-    silent = true, 
-    desc = '列出所有打开的标签页' 
+      from = '<Leader>tm',
+      to = '<cmd>Telescope buffers sort_mru=true select_current=true<CR>', 
+      silent = true, 
+      desc = '列出所有打开的标签页' 
     },
 
     -- ==============================================
