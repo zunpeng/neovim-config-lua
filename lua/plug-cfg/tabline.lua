@@ -1,3 +1,4 @@
+-- 当前配置已废弃，可以删除，使用bufferline.lua配置
 return {
     'akinsho/bufferline.nvim',
     version = "*",

@@ -60,6 +60,33 @@ local mappings = {
     -- 打开/关闭目录树
     { from = '<Leader>ee', to = ':NvimTreeToggle<CR>' },
 
+    -- ========== 新增：bufferline 标签页操作 ==========
+    { from = '<Leader>th', to = '<cmd>BufferLineCyclePrev<CR>', silent = true, desc = '切换到左侧标签页' },
+    { from = '<Leader>tl', to = '<cmd>BufferLineCycleNext<CR>', silent = true, desc = '切换到右侧标签页' },
+    {
+        from = '<Leader>tq',
+        to = function()
+            local bufnr = vim.api.nvim_get_current_buf()
+            -- 先切换到上一个标签，再删除当前缓冲区
+            -- 保证编辑窗口始终存在，避免触发 NvimTree 自动退出
+            vim.cmd("BufferLineCyclePrev")
+            vim.schedule(function()
+                vim.cmd("bdelete " .. bufnr)
+            end)
+        end,
+        silent = true,
+        desc = '关闭当前标签页（保留窗口布局）'
+    },
+    -- telescope 标签列表操作
+    {
+    from = '<Leader>tm',
+    to = '<cmd>Telescope buffers sort_mru=true select_current=true<CR>', 
+    silent = true, 
+    desc = '列出所有打开的标签页' 
+    },
+
+    -- ==============================================
+
     -- 分割窗口
     -- 向左分割,光标在当前窗口
     { from = '<localleader>wh', to = ':set splitright<CR>:vsplit<CR>' },
@@ -143,10 +170,12 @@ local mappings = {
     { from = '<C-S-l>', to = '<Esc>A', mode = mode_i },
 }
 
--- 循环加载配置
+-- ========== 修改：循环加载配置，新增 silent 和 desc 支持 ==========
 for _, mapping in ipairs(mappings) do
     vim.keymap.set(mapping.mode or "n", mapping.from, mapping.to, {
-        noremap = not mapping.remap
+        noremap = not mapping.remap,
+        silent = mapping.silent or false,
+        desc = mapping.desc or nil,
     })
 end
 
