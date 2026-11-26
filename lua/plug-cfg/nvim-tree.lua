@@ -3,23 +3,34 @@ vim.api.nvim_create_autocmd('BufEnter', {
     pattern = '*',
     callback = function()
         -- 原有逻辑：只剩文件树窗口时自动退出
-        if vim.fn.winnr('$') == 1 and vim.bo.filetype == 'NvimTree' then
+        local wins = vim.api.nvim_list_wins()
+        local only_tree = true
+        for _, win in ipairs(wins) do
+            local buf = vim.api.nvim_win_get_buf(win)
+            if vim.bo[buf].filetype ~= 'NvimTree' then
+                only_tree = false
+                break
+            end
+        end
+        if only_tree and #wins >= 1 then
             vim.cmd('q')
             return
         end
 
-        -- ========== 新增：智能定位 + 自动切根 ==========
+        -- ========== 核心修复：NvimTree 自身缓冲区直接跳过 ==========
+        if vim.bo.filetype == 'NvimTree' then
+            return
+        end
+        -- ========================================================
+
+        -- 智能定位 + 自动切根
         local ok, api = pcall(require, 'nvim-tree.api')
         if not ok then return end
-
-        -- 仅在 nvim-tree 打开时执行
         if not api.tree.is_visible() then return end
 
-        -- 获取当前文件绝对路径，空缓冲区直接跳过
+        -- 获取当前文件绝对路径，空缓冲区/新建未保存文件直接跳过
         local file_path = vim.fn.expand('%:p')
         if file_path == '' then return end
-
-        -- 统一路径分隔符为正斜杠，兼容 Windows
         file_path = file_path:gsub('\\', '/')
 
         -- 获取 nvim-tree 当前根目录
@@ -35,11 +46,11 @@ vim.api.nvim_create_autocmd('BufEnter', {
             -- 在目录内：只定位高亮，不切换根目录
             api.tree.find_file({
                 buf = 0,
-                open = false,  -- 不重复打开树
-                focus = false, -- 不把焦点移到树窗口，保持在编辑区
+                open = false,
+                focus = false,
             })
         else
-            -- 不在目录内：切换根目录到文件所在目录，再定位
+            -- 不在目录内：自动切换根目录到文件所在目录，再定位
             local file_dir = vim.fn.expand('%:p:h'):gsub('\\', '/')
             api.tree.change_root(file_dir)
             api.tree.find_file({
@@ -48,7 +59,6 @@ vim.api.nvim_create_autocmd('BufEnter', {
                 focus = false,
             })
         end
-        -- ==============================================
     end
 })
 
@@ -64,7 +74,6 @@ return {
                 local function opts(desc)
                     return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
                 end
-                -- 加载默认快捷键
                 api.config.mappings.default_on_attach(bufnr)
                 -- 自定义快捷键
                 vim.keymap.set('n', 'l', api.node.open.edit, opts('Open'))
@@ -76,11 +85,21 @@ return {
 
             require("nvim-tree").setup {
                 on_attach = my_on_attach,
-                -- 关闭原生自动跟随，改用上面的自定义智能逻辑，避免重复刷新
+                -- 关闭原生自动跟随，使用自定义的智能判断逻辑
                 update_focused_file = {
                     enable = false,
                 },
             }
+
+            -- 方案二，使用原生实现文件在根内只定位，不在则切根
+            -- require("nvim-tree").setup {
+            --     on_attach = my_on_attach,
+            --     update_focused_file = {
+            --         enable = true,
+            --         update_root = true, -- 文件不在根目录时自动切根，在则只定位
+            --         ignore_list = {},
+            --     },
+            -- }
         end
     }
 }
